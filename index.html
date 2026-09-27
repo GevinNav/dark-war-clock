@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dark War Survival - Command Time & Converter</title>
+  <style>
+    :root {
+      --bg-color: #0b0d0e;
+      --panel-bg: #13171a;
+      --panel-border: #263238;
+      --accent-amber: #ff9800;
+      --accent-cyan: #00bcd4;
+      --accent-green: #4caf50;
+      --text-main: #cfd8dc;
+      --text-dim: #78909c;
+      --font-hud: 'Courier New', Courier, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: var(--font-hud);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 15px;
+      background-image: 
+        radial-gradient(circle at 50% 50%, rgba(0, 188, 212, 0.05) 0%, transparent 80%),
+        linear-gradient(rgba(19, 23, 26, 0.8) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(19, 23, 26, 0.8) 1px, transparent 1px);
+      background-size: 100% 100%, 20px 20px, 20px 20px;
+    }
+
+    .hud-card {
+      background: var(--panel-bg);
+      border: 2px solid var(--panel-border);
+      border-radius: 8px;
+      padding: 24px;
+      width: 100%;
+      max-width: 680px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 15px rgba(255, 152, 0, 0.1);
+      position: relative;
+    }
+
+    .hud-card::before {
+      content: "TACTICAL HQ // TIME COMMAND";
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background: var(--panel-bg);
+      padding: 0 10px;
+      font-size: 0.75rem;
+      color: var(--accent-amber);
+      letter-spacing: 2px;
+      border: 1px solid var(--panel-border);
+    }
+
+    .clock-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 10px;
+      margin-bottom: 25px;
+    }
+
+    @media (max-width: 500px) {
+      .clock-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .clock-box {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid var(--panel-border);
+      padding: 15px;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .clock-box.server {
+      border-color: rgba(255, 152, 0, 0.4);
+    }
+
+    .clock-box.local {
+      border-color: rgba(0, 188, 212, 0.4);
+    }
+
+    .clock-title {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+    }
+
+    .clock-time {
+      font-size: 1.8rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    .server .clock-time { color: var(--accent-amber); }
+    .local .clock-time { color: var(--accent-cyan); }
+
+    .converter-section {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px dashed var(--panel-border);
+      padding: 20px;
+      border-radius: 6px;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .slider-title {
+      font-size: 0.85rem;
+      color: var(--text-main);
+      letter-spacing: 1px;
+    }
+
+    .slider-readout {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--accent-amber);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 8px;
+      background: #1c2429;
+      border-radius: 4px;
+      outline: none;
+      accent-color: var(--accent-amber);
+      margin-bottom: 15px;
+    }
+
+    .step-buttons {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      background: #1c2429;
+      border: 1px solid var(--panel-border);
+      color: var(--text-main);
+      padding: 6px 12px;
+      font-family: var(--font-hud);
+      font-size: 0.8rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      background: var(--panel-border);
+      color: var(--accent-amber);
+    }
+
+    .result-box {
+      background: rgba(0, 188, 212, 0.05);
+      border: 1px solid rgba(0, 188, 212, 0.3);
+      padding: 12px;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .result-label {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+    }
+
+    .result-value {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: var(--accent-cyan);
+    }
+
+    .day-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin-left: 8px;
+      background: rgba(255,255,255,0.1);
+      color: var(--text-dim);
+    }
+
+    .day-badge.prev {
+      background: rgba(255, 152, 0, 0.2);
+      color: var(--accent-amber);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hud-card">
+    <!-- Live Clocks -->
+    <div class="clock-grid">
+      <div class="clock-box server">
+        <div class="clock-title">// GAME SERVER TIME (+3H)</div>
+        <div class="clock-time" id="serverClock">00:00:00</div>
+      </div>
+      <div class="clock-box local">
+        <div class="clock-title">// YOUR LOCAL TIME</div>
+        <div class="clock-time" id="localClock">00:00:00</div>
+      </div>
+    </div>
+
+    <!-- 24-Hour Converter -->
+    <div class="converter-section">
+      <div class="slider-header">
+        <span class="slider-title">24-HOUR EVENT TIMELINE</span>
+        <span class="slider-readout" id="sliderValDisplay">12:00</span>
+      </div>
+
+      <input type="range" id="timeSlider" min="0" max="1425" step="15" value="720">
+
+      <div class="step-buttons">
+        <button class="btn" onclick="adjustSlider(-60)">-1H</button>
+        <button class="btn" onclick="adjustSlider(-15)">-15M</button>
+        <button class="btn" onclick="adjustSlider(15)">+15M</button>
+        <button class="btn" onclick="adjustSlider(60)">+1H</button>
+      </div>
+
+      <div class="result-box">
+        <div class="result-label">CONVERTED LOCAL TIME (-3 HOURS)</div>
+        <div class="result-value">
+          <span id="convertedLocalTime">09:00</span>
+          <span class="day-badge" id="dayBadge">SAME DAY</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const OFFSET_HOURS = 3;
+
+    function formatDigits(num) {
+      return String(num).padStart(2, '0');
+    }
+
+    function updateLiveClocks() {
+      const now = new Date();
+      const localH = formatDigits(now.getHours());
+      const localM = formatDigits(now.getMinutes());
+      const localS = formatDigits(now.getSeconds());
+      document.getElementById('localClock').textContent = `${localH}:${localM}:${localS}`;
+
+      const serverDate = new Date(now.getTime() + (OFFSET_HOURS * 3600 * 1000));
+      const serverH = formatDigits(serverDate.getHours());
+      const serverM = formatDigits(serverDate.getMinutes());
+      const serverS = formatDigits(serverDate.getSeconds());
+      document.getElementById('serverClock').textContent = `${serverH}:${serverM}:${serverS}`;
+    }
+
+    function updateConverter() {
+      const sliderVal = parseInt(document.getElementById('timeSlider').value, 10);
+      const serverHours = Math.floor(sliderVal / 60);
+      const serverMins = sliderVal % 60;
+
+      document.getElementById('sliderValDisplay').textContent = 
+        `${formatDigits(serverHours)}:${formatDigits(serverMins)} SERVER`;
+
+      let localTotalMins = sliderVal - (OFFSET_HOURS * 60);
+      let isPrevDay = false;
+
+      if (localTotalMins < 0) {
+        localTotalMins += 24 * 60;
+        isPrevDay = true;
+      }
+
+      const localHours = Math.floor(localTotalMins / 60);
+      const localMins = localTotalMins % 60;
+
+      document.getElementById('convertedLocalTime').textContent = 
+        `${formatDigits(localHours)}:${formatDigits(localMins)}`;
+
+      const badge = document.getElementById('dayBadge');
+      if (isPrevDay) {
+        badge.textContent = "PREVIOUS DAY";
+        badge.className = "day-badge prev";
+      } else {
+        badge.textContent = "SAME DAY";
+        badge.className = "day-badge";
+      }
+    }
+
+    function adjustSlider(amount) {
+      const slider = document.getElementById('timeSlider');
+      let val = parseInt(slider.value, 10) + amount;
+      if (val < 0) val = 0;
+      if (val > 1425) val = 1425;
+      slider.value = val;
+      updateConverter();
+    }
+
+    document.getElementById('timeSlider').addEventListener('input', updateConverter);
+
+    setInterval(updateLiveClocks, 1000);
+    updateLiveClocks();
+    updateConverter();
+  </script>
+</body>
+</html>
